@@ -2,27 +2,31 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def search_incruit(keyword):
+def search_incruit(keyword, page=1):
     jobs = []
 
-    response = requests.get(f"https://search.incruit.com/list/search.asp?col=job&kw={keyword}&startno=0")
-    soup = BeautifulSoup(response.text, "html.parser")
-    lis = soup.find_all("li", class_="c_col")
+    for i in range(page):
 
-    for li in lis: 
-        company = li.find("a", class_="cpname").text
-        title = li.find("div", class_="cell_mid").find("a").text
-        location = li.find("div", class_="cl_md").find_all("span")[2].text
-        link = li.find("div", class_="cell_mid").find("a").get("href")
-        
-        job_data = {
-            "title": title, 
-            "company": company,
-            "location": location, 
-            "link": link
-        }
+        page = i * 30
+        response = requests.get(
+            f"https://search.incruit.com/list/search.asp?col=job&kw={keyword}&startno={page}")
+        soup = BeautifulSoup(response.text, "html.parser")
+        lis = soup.find_all("li", class_="c_col")
 
-        jobs.append(job_data)
+        for li in lis: 
+            company = li.find("a", class_="cpname").text
+            title = li.find("div", class_="cell_mid").find("a").text
+            location = li.find("div", class_="cl_md").find_all("span")[2].text
+            link = li.find("div", class_="cell_mid").find("a").get("href")
+            
+            job_data = {
+                "title": title, 
+                "company": company,
+                "location": location, 
+                "link": link
+            }
+
+            jobs.append(job_data)
     
     return jobs
 
@@ -59,9 +63,6 @@ def search_jobkorea(keyword, page=1):
     return jobs
 
 
-result = search_jobkorea("파이썬", 10)
-print(result)
-print(len(result))
 
 
 
